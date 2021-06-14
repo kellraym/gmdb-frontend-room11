@@ -1,25 +1,50 @@
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter as Router, Route, Link, Switch, useHistory, Redirect } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import Nav from './modules/Nav'
+import MoviePage from './modules/MoviePage'
+import AppContext from './Context/AppContext'
 
 function App() {
+
+  const [movies, setMovies] = useState([])
+
+  useEffect(() => {
+    function Display() {
+      fetch('http://localhost:3001/movies')
+        .then(response => response.json())
+        .then(movies => movies.map((movie) => setMovies([...movies, movie])))
+    }
+    Display()
+  }, [])
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppContext.Provider value={{
+      movies
+    }}>
+      <div>
+        <Router>
+          <Nav />
+          <Redirect exact from="/home" to="/" />
+          <Route exact path="/" component={MoviePage} />
+           {/* <MoviePage /> */}
+        </Router>
+      </div>
+    </AppContext.Provider>
+
   );
+
+  // async function getCatImage() {
+  //   let res = await fetch("https://api.thecatapi.com/v1/images/search/");
+  //   let json = await res.json();
+  //   console.log(json);
+  //   let imageUrl = await json[0].url;
+  //   return imageUrl;
+  // }
+
+
 }
+
 
 export default App;
